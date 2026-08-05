@@ -1,7 +1,7 @@
 import pytest
 from api.builders.booking_builder import BookingBuilder
 from assertions.api.booking_assertion import BookingAssertions
-from services.BookingService import BookingService
+from services.booking_service import BookingService
 
 @pytest.mark.smoke
 @pytest.mark.api
