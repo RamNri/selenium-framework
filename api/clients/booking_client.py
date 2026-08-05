@@ -4,12 +4,15 @@ from api.mapper.booking_mapper import BookingMapper
 from api.models.booking_request import BookingRequest
 
 class BookingClient:
+  """
+  Client responsible for communicating with the Booking endpoints
+  """
 
   def __init__(self, api_client: ApiClient):
-    self.__client = api_client
+    self._client = api_client
 
   
-  def create_booking(self, request: BookingRequest):
+  def create_booking(self, request: BookingRequest) -> BookingResponse:
     """
     Creates a new booking,
 
@@ -20,22 +23,38 @@ class BookingClient:
       BookingResponse
     """
     payload = BookingMapper.to_request(request)
-    response = self.__client.post("/booking", json=payload)
+    response = self._client.post("/booking", json=payload)
     return BookingResponse(response)
   
-  def get_booking(self, booking_id: int):
+  def get_booking(self, booking_id: int) -> BookingResponse:
     response = self._client.get(f"/booking/{booking_id}")
     return BookingResponse(response)
   
-  def update_booking(self, booking_id: int, request: BookingRequest) -> BookingResponse:
+  def update_booking(
+      self, 
+      booking_id: int, 
+      request: BookingRequest,
+      token:str) -> BookingResponse:
+    
     """ updates an existing booking """
+
     payload = BookingMapper.to_request(request)
-    response  = self.__client.put(f"/booking/{booking_id}", json=payload)
+    headers = {
+      "Cookie" : f"token={token}"
+    }
+    response  = self._client.put(f"/booking/{booking_id}", json=payload, headers=headers)
     return BookingResponse(response)
   
-  def delete_booking(self, booking_id: int) -> BookingResponse:
+  def delete_booking(
+      self, 
+      booking_id: int, 
+      token: str) -> BookingResponse:
     """Deletes a booking"""
-    response = self.__client.delete(f"/booking/{booking_id}")
+
+    headers = {
+      "Cookie": f"token={token}"
+    }
+    response = self._client.delete(f"/booking/{booking_id}", headers=headers)
     return BookingResponse(response)
 
 # TODO:
