@@ -1,52 +1,64 @@
-import requests
+from __future__ import annotations
+from threading import Lock
 from api.clients.auth_client import AuthClient
-from config import settings
 
 class AuthenticationManager:
+  """
+  Responsible for managing authentication tokens.
 
-  def __init_(self, auth_client: AuthClient, username: str, password: str ):
+  Responsibilities:
+    - Authenticate using AuthClient.
+    - Cache authentication token.
+    - Return cached token whenever possible.
+    - Be thred-safe for future parallel execution
+  """
+
+  def __init__(self, auth_client: AuthClient, username: str, password: str ):
     self._auth_client = auth_client
     self._username = username
     self._password = password
-    self._token = None
-    self._session = None
+    self._token: str | None = None
+    self._lock = Lock()
 
   def get_token(self):
     """
-    Authenticate only once and cache the token
+    Returns a valid authentication token.
+    Authentication happens only once.
+    Subsequent calls resuse the cached token.
 
+    Returns:
+        str: Authentication token.
     """
-    if self._token is None:
+    #(alredy authenticated)
+    if self._token is not None:
+      return self._token
 
-      auth = self._auth_client.create_token(
+    #Thread safe authentication
+    with self._lock:
+       
+       #Another thread may already have authenticated
+      if self._token is not None:
+         return self._token
+ 
+      auth_response = self._auth_client.create_token(
         self._username,
         self._password
       )
 
-      if not auth.is_authenticated:
+      if not auth_response.is_authenticated:
         raise RuntimeError(
           f"Authentication failed"
-          f"{auth.error_message}"
+          f"{auth_response.error_message}"
         )
       
-      self._token = auth.token
+      self._token = auth_response.token
 
-    return self._token
+      return self._token
   
-  def get_session(self):
+  def invalidate(self) -> None:
     """
-    Return one authenticated request.Session()
-
+    Clears the cached authentication token.
+    The next call to get_token() will authenticate again.
     """
-
-    if self._session is None:
-      session = requests.Session()
-      session.headers.update(
-        {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Cookie": f"token{self.get_token()}"
-
-      })
-      self._session = session
-    return self._session
+    with self._lock:
+      self._token = None
