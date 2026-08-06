@@ -43,7 +43,7 @@ class Booking:
       and self.lastname == other.lastname
       and self.totalprice == other.totalprice
       and self.depositpaid == other.depositpaid
-      and self.bookingdates == other.BookingDates
-      and self.additionalneeds == others.additionalneeds
+      and self.bookingdates == other.bookingdates
+      and self.additionalneeds == other.additionalneeds
     )
 

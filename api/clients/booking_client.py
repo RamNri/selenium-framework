@@ -9,7 +9,7 @@ class BookingClient:
   """
 
   def __init__(self, api_client: ApiClient):
-    self._client = api_client
+    self.__client = api_client
 
   
   def create_booking(self, request: BookingRequest) -> BookingResponse:
@@ -23,11 +23,14 @@ class BookingClient:
       BookingResponse
     """
     payload = BookingMapper.to_request(request)
-    response = self._client.post("/booking", json=payload)
+    response = self.__client.post("/booking", json=payload)
     return BookingResponse(response)
   
   def get_booking(self, booking_id: int) -> BookingResponse:
-    response = self._client.get(f"/booking/{booking_id}")
+    """
+    Retrieves a  booking
+    """
+    response = self.__client.get(f"/booking/{booking_id}")
     return BookingResponse(response)
   
   def update_booking(
@@ -42,7 +45,7 @@ class BookingClient:
     headers = {
       "Cookie" : f"token={token}"
     }
-    response  = self._client.put(f"/booking/{booking_id}", json=payload, headers=headers)
+    response  = self.__client.put(f"/booking/{booking_id}", json=payload, headers=headers)
     return BookingResponse(response)
   
   def delete_booking(
@@ -54,7 +57,7 @@ class BookingClient:
     headers = {
       "Cookie": f"token={token}"
     }
-    response = self._client.delete(f"/booking/{booking_id}", headers=headers)
+    response = self.__client.delete(f"/booking/{booking_id}", headers=headers)
     return BookingResponse(response)
 
 # TODO:
