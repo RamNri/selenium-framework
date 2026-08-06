@@ -20,7 +20,7 @@ class AuthResponse(BaseResponse):
   @property
   def error_message(self):
     return (
-      self.body.get("reaons")
+      self.body.get("reason")
       or self.body.get("message")
       or ""
     )

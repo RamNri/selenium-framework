@@ -45,6 +45,11 @@ class AuthenticationManager:
         self._password
       )
 
+      print("------------------------------------")
+      print(auth_response.status_code)
+      print(auth_response.body)
+      print("------------------------------------")
+
       if not auth_response.is_authenticated:
         raise RuntimeError(
           f"Authentication failed"

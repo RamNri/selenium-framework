@@ -11,7 +11,7 @@ class AuthClient:
       "password": password
     }
 
-    response = self.client.post("/auth", json=payload)
+    response = self._api_client.post("/auth", json=payload)
     return AuthResponse(response)
 
   def login(self, username, password):
@@ -19,4 +19,4 @@ class AuthClient:
       "username": username,
       "password": password
     }
-    return self.client.post("/login", payload)
+    return self._api_client.post("/login", payload)

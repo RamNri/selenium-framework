@@ -2,6 +2,7 @@ from api.client.api_client import ApiClient
 from api.responses.booking_response import BookingResponse
 from api.mapper.booking_mapper import BookingMapper
 from api.models.booking_request import BookingRequest
+from api.responses.base_response import BaseResponse
 
 class BookingClient:
   """
@@ -56,7 +57,7 @@ class BookingClient:
       "Cookie": f"token={token}"
     }
     response = self.__client.delete(f"/booking/{booking_id}", headers=headers)
-    return BookingResponse(response)
+    return BaseResponse(response)
 
 # TODO:
 # Add request/response logging.

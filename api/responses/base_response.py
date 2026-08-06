@@ -1,3 +1,5 @@
+from requests.exceptions import JSONDecodeError
+
 class BaseResponse:
   def __init__(self, response):
     self.response = response
@@ -35,5 +37,9 @@ class BaseResponse:
   
   @property
   def json(self):
-    return self.response.json()
+    try:
+      return self.response.json()
+    except JSONDecodeError:
+      return None
+  
   

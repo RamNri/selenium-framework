@@ -27,8 +27,8 @@ class ApiFactory:
 
     self._authentication_manager = AuthenticationManager(
       auth_client=auth_client,
-      username=settings.USERNAME,
-      password=settings.PASSWORD
+      username=settings.API_USERNAME,
+      password=settings.API_PASSWORD
     )
 
     #Authenitcated Session

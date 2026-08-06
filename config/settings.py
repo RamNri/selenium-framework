@@ -5,5 +5,5 @@ TIMEOUT = 10
 API_BASE_URL='https://restful-booker.herokuapp.com'
 REQUEST_TIMEOUT = 30
 API_USERNAME = "admin"
-API_PASSWORF = "password123"
+API_PASSWORD = "password123"
 MAX_API_RESPONSE_TIME = 5

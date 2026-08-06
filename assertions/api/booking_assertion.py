@@ -95,3 +95,12 @@ class BookingAssertions:
 
      ApiAssertions.assert_status(response, 201)
      ApiAssertions.assert_response_time(response, settings.MAX_API_RESPONSE_TIME)
+  
+  @staticmethod
+  def assert_booking_not_found(response: BookingResponse):
+     """
+     Verify booking no longer exists.
+     """
+
+     ApiAssertions.assert_status(response, 404)
+     assert response.booking is None, ("Booking shoud not exist after deleteion")

@@ -44,7 +44,7 @@ class BookingService:
 
     return self._client.update_booking(
       booking_id=booking_id, 
-      equest=request,
+      request=request,
       token=self._authentication_manager.get_token()
       )
 
