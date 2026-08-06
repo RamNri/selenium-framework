@@ -9,7 +9,7 @@ class ApiClient:
   
   def request(self, method, endpoint, **kwargs):
     endpoint = endpoint.lstrip("/")
-    return self.session.request(method=method, url=f"{self._base_url}/{endpoint}", 
+    return self._session.request(method=method, url=f"{self._base_url}/{endpoint}", 
                                 timeout=self._timeout, 
                                 **kwargs)
 

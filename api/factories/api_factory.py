@@ -3,7 +3,7 @@ from config import settings
 from api.auth.authentication_manager import AuthenticationManager
 from api.client.api_client import ApiClient
 from api.clients.auth_client import AuthClient
-from clients.booking_client import BookingClient
+from api.clients.booking_client import BookingClient
 from services.booking_service import BookingService
 
 class ApiFactory:

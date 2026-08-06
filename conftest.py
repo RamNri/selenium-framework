@@ -29,6 +29,8 @@ def pytest_runtest_makereport(item, call):
   if report.when == "call":
     if report.failed:
       driver = item.funcargs.get("driver")
+      if driver is None:
+        return
       screenshot_dir = (
         Path("artifacts")/"screenshots" / item.name
       )

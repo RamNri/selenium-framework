@@ -17,15 +17,15 @@ class BookingBuilder:
 
   @classmethod
   def default(cls):
-    return cls._from_json(cls.DEFAULT_BOOKING)
+    return cls._from_json(DEFAULT_BOOKING)
   
   @classmethod
   def updated(cls):
-    return cls._from_json(cls.UPDATED_BOOKING)
+    return cls._from_json(UPDATE_BOOKING)
   
   @classmethod
   def invalid(cls):
-    return cls._From_json(cls.INVALID_BOOKING)
+    return cls._from_json(INVALID_BOOKING)
   
   @classmethod
   def _from_json(cls, path):
@@ -33,7 +33,7 @@ class BookingBuilder:
     builder = cls()
 
     builder._firstname = data["firstname"]
-    builder._lastname = data["latname"]
+    builder._lastname = data["lastname"]
     builder._totalprice = data["totalprice"]  
     builder._depositpaid = data["depositpaid"]
     builder._checkin = data["bookingdates"]["checkin"]
@@ -50,11 +50,11 @@ class BookingBuilder:
     self._lastname = lastname
     return self
   
-  def with_totalprice(self, totalprice: str):
+  def with_totalprice(self, totalprice: int):
     self._totalprice = totalprice
     return self
   
-  def with_depositpaid(self, depositpaid: str):
+  def with_depositpaid(self, depositpaid: bool):
     self._depositpaid = depositpaid
     return self
   
@@ -66,7 +66,7 @@ class BookingBuilder:
     self._checkout = checkout
     return self
   
-  def with_additonal_needs(self, needs: str):
+  def with_additional_needs(self, needs: str):
     self._additionalneeds = needs
     return self
   
