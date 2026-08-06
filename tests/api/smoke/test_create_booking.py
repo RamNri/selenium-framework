@@ -1,6 +1,7 @@
 import pytest
 from api.builders.booking_builder import BookingBuilder
 from api.factories.api_factory import ApiFactory
+from assertions.api.booking_assertion import BookingAssertions
 
 @pytest.fixture(scope="module")
 def booking_service():
@@ -20,18 +21,4 @@ def test_create_booking_successfully(booking_service):
   response = booking_service.create_booking(request)
 
   #Assert
-  assert response.ok
-
-  assert response.is_create_response
-
-  assert response.booking_id is not None
-
-  assert response.booking is not None
-
-  assert(response.booking.firstname == request.booking.firstname)
-
-  assert(response.booking.lastname == request.booking.lastname)
-
-  assert(response.booking.totalprice == request.booking.totalprice)
-
-  assert(response.booking.depositpaid == request.booking.depositpaid)
+  BookingAssertions.assert_booking_equals(request.booking, response.booking)

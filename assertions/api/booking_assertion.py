@@ -69,3 +69,29 @@ class BookingAssertions:
          f"Expected:\n{expected}\n\n"
          f"Actual:\n{actual}" 
       )
+  
+  @staticmethod
+  def assert_update_booking(
+     request: BookingRequest,
+     response: BookingResponse
+  ) -> None:
+     
+     """
+     Verify update Booking response.
+     """
+
+     ApiAssertions.assert_status(response, 200)
+     ApiAssertions.assert_response_time(response, settings.MAX_API_RESPONSE_TIME)
+
+     assert response.booking is not None, ("Updated booking should not be None.")
+
+     BookingAssertions.assert_booking_equals(request.booking, response.booking)
+
+  @staticmethod
+  def assert_delete_booking(response: BookingResponse) -> None:
+     """
+     Verfiy Delete Booking response
+     """
+
+     ApiAssertions.assert_status(response, 201)
+     ApiAssertions.assert_response_time(response, settings.MAX_API_RESPONSE_TIME)

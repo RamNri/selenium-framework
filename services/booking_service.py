@@ -29,7 +29,7 @@ class BookingService:
   
   def get_booking(
       self,
-      booking_id: int) -> BookingRequest:
+      booking_id: int) -> BookingResponse:
     """
     Retrieves an existing booking
     """
@@ -42,11 +42,11 @@ class BookingService:
       request: BookingRequest) -> BookingResponse:
     """updates an existing booking"""
 
-    token = self._authentication_manager.get_token()
-
-    return self._client.update_booking(booking_id=booking_id, 
-                                       request=request,
-                                       token=token)
+    return self._client.update_booking(
+      booking_id=booking_id, 
+      equest=request,
+      token=self._authentication_manager.get_token()
+      )
 
   
   def delete_booking(
@@ -54,8 +54,7 @@ class BookingService:
       booking_id: int) -> BookingResponse:
     """Deletes an existing booking"""
 
-    token = self._authentication_manager.get_token()
-
     return self._client.delete_booking(
       booking_id=booking_id,
-      token=token)
+      token=self._authentication_manager.get_token()
+      )

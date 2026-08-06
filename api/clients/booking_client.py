@@ -37,14 +37,12 @@ class BookingClient:
       self, 
       booking_id: int, 
       request: BookingRequest,
-      token:str) -> BookingResponse:
+      token: str) -> BookingResponse:
     
     """ updates an existing booking """
 
     payload = BookingMapper.to_request(request)
-    headers = {
-      "Cookie" : f"token={token}"
-    }
+    headers = {"Cookie" : f"token={token}"}
     response  = self.__client.put(f"/booking/{booking_id}", json=payload, headers=headers)
     return BookingResponse(response)
   
