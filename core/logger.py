@@ -1,27 +1,73 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
+from datetime import datetime
 
+def configure_logging() -> logging.Logger:
+  """
+  Configure the framework logging.
 
-def configure_logging():
-    """
-    Configure logging for the entire framework.
-    Creates artifacts/logs/execution.log.
-    """
-    log_folder = Path("artifacts") / "logs"
-    log_folder.mkdir(parents=True, exist_ok=True)
+  Creates
+      artifacts/
+              logs/
+                  <timestamp>/
+                             framework.log
+  
+  Returns:
+  logging.Logger
+  """
 
-    log_file = log_folder / "execution.log"
+  timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+  log_directory = Path("artifacts") / "logs" / timestamp
+  log_directory.mkdir(parents=True, exist_ok=True)
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        handlers=[
-            logging.FileHandler(log_file, mode="w"),
-            logging.StreamHandler(),
-        ],
-        force=True,
+  log_file = log_directory/ "framework.log"
+  
+
+  #It structures your log text into a clean, predictable, tabular format separated by pipes (|)
+
+  formatter = logging.Formatter(
+    fmt=(
+      "%(asctime)s |"
+      "%(levelname)-8s |"
+      "%(name)-15s |"
+      "%(message)s"
+      ),
+      datefmt="%Y-%m-%d %H:%M:%S",
     )
-    return logging.getLogger()
+  
+  root_logger = logging.getLogger()  #gets the root logger
+  root_logger.handlers.clear()
+
+  root_logger.setLevel(logging.INFO)
+
+  #Console handler
+  console_handler = logging.StreamHandler()
+  console_handler.setFormatter(formatter)
+
+  #File handler
+  file_handler = logging.FileHandler(log_file, encoding="utf-8")
+  file_handler.setFormatter(formatter)
+
+  root_logger.addHandler(console_handler)
+  root_logger.addHandler(file_handler)
+
+  root_logger.info("=" * 80)
+  root_logger.info("Logging started")
+
+  root_logger.info(
+    "Log file: %s",
+    log_file.resolve()
+  )
+
+  root_logger.info("=" * 80)
+
+  return root_logger
 
 
-__all__ = ["configure_logging"]
+
+
+
+
+
