@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Callable
+from core.exceptions.retry_exception import ( RetryExhaustedException,)
 
 import logging
 import time
@@ -57,7 +58,7 @@ class RetryPolicy:
 
     #Raise last exception if we had one
     if last_exception:
-       raise last_exception
+       raise RetryExhaustedException("Retry attempts exhuasted.") from last_exception
     
     #otherwise return final response
     return response 

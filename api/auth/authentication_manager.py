@@ -1,6 +1,7 @@
 from __future__ import annotations
 from threading import Lock
 from api.clients.auth_client import AuthClient
+from core.exceptions.authentication_exception import (AuthenticationException,)
 
 class AuthenticationManager:
   """
@@ -46,7 +47,7 @@ class AuthenticationManager:
       )
 
       if not auth_response.is_authenticated:
-        raise RuntimeError(
+        raise AuthenticationException(
           f"Authentication failed"
           f"{auth_response.error_message}"
         )
