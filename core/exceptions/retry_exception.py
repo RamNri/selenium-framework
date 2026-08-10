@@ -1,4 +1,4 @@
-from core.exceptions.api_exceptions import ApiException
+from core.exceptions.api_exception import ApiException
 
 class RetryExhaustedException(ApiException):
   """

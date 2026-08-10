@@ -2,6 +2,9 @@ from __future__ import annotations
 from threading import Lock
 from api.clients.auth_client import AuthClient
 from core.exceptions.authentication_exception import (AuthenticationException,)
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AuthenticationManager:
   """
@@ -47,12 +50,18 @@ class AuthenticationManager:
       )
 
       if not auth_response.is_authenticated:
+        logger.error(
+          "Authentication failed for user '%s'. Reason: %s",self._username, auth_response.error_message
+        )
         raise AuthenticationException(
-          f"Authentication failed"
-          f"{auth_response.error_message}"
+          f"Authentication failed for the user"
+          f"'{self._username}'."
+          f"Reason:{auth_response.error_message}"
         )
       
       self._token = auth_response.token
+
+      logger.info("Authentication successful for user '%s'.", self._username)
 
       return self._token
   

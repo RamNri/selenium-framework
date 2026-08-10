@@ -2,6 +2,7 @@
 import requests
 from unittest.mock import Mock, call
 from core.retry_policy import RetryPolicy
+from core.exceptions import RetryExhaustedException
 
 class TestRetryPolicy:
   """
@@ -101,8 +102,10 @@ class TestRetryPolicy:
       operation = Mock(side_effect=requests.Timeout())
 
       import pytest
-      with pytest.raises(requests.Timeout):
+      with pytest.raises(RetryExhaustedException) as ex:
         self.policy.execute(operation)
+      
+      assert isinstance(ex.value.__cause__, requests.Timeout)
     
       assert operation.call_count == 3
       self.fake_sleep.assert_has_calls(

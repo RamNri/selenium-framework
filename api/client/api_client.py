@@ -2,6 +2,8 @@ import requests
 from config import settings
 from framework_logging.api_logger import ApiLogger
 from core.retry_policy import RetryPolicy
+from requests import RequestException
+from core.exceptions import ApiRequestException
 
 class ApiClient:
   def __init__(self, session: requests.Session, base_url: str, timeout: int=30):
@@ -18,12 +20,19 @@ class ApiClient:
     url = f"{self._base_url}/{endpoint}"
 
     ApiLogger.log_request(method=method, url=url, headers=kwargs.get("headers"), body=kwargs.get("json"))
-    response = self._retry.execute(lambda: self._session.request(
-      method=method,
-      url=url, 
-      timeout=self._timeout, 
-      **kwargs)
-    )
+    try:
+      response = self._retry.execute(lambda: self._session.request(
+        method=method,
+        url=url, 
+        timeout=self._timeout, 
+        **kwargs)
+      )
+      ApiLogger.log_response(response)
+      return response
+    except RequestException as ex:
+      raise ApiRequestException(
+        f"HTTP request failed for '{method} {url}'."
+      ) from ex
     
     ApiLogger.log_response(response)
 

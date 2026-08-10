@@ -58,7 +58,11 @@ class RetryPolicy:
 
     #Raise last exception if we had one
     if last_exception:
-       raise RetryExhaustedException("Retry attempts exhuasted.") from last_exception
+       logger.error(
+          "Retry exhausted after %s attempts.", self._retries, )
+       raise RetryExhaustedException(
+       f"operation failed after"
+       f"{self._retries} retry attempts") from last_exception
     
     #otherwise return final response
     return response 
