@@ -3,6 +3,7 @@ from api.models.booking_dates import BookingDates
 from api.models.booking_request import BookingRequest
 from utilities.json_loader import JsonLoader
 from config.paths import(DEFAULT_BOOKING, UPDATE_BOOKING, INVALID_BOOKING )
+from core.data.fake_data import FakeData
 
 class BookingBuilder:
  
@@ -41,6 +42,38 @@ class BookingBuilder:
     builder._additionalneeds = data["additionalneeds"]
 
     return builder  
+
+  @classmethod
+  def random(cls):
+    builder = cls.default()
+
+    checkin, checkout = FakeData.booking_dates()
+    builder._firstname = FakeData.first_name()
+    builder._lastname = FakeData.last_name()
+    builder._totalprice = FakeData.total_price()
+    builder._checkin = checkin
+    builder._checkout= checkout
+
+    builder._additionalneeds = (FakeData.additional_needs())
+    return builder
+
+  @classmethod
+  def vip(cls):
+    return (
+      cls.random().with_totalprice(5000).with_additional_needs("Breakfast")
+    )
+
+  @classmethod
+  def family_trip(cls):
+    return (
+      cls.random().with_additional_needs("Baby crib")
+    )
+
+  @classmethod
+  def business_trip(cls):
+    return(
+      cls.random().with_additional_needs("Late Checkout")
+    )
   
   def with_firstname(self, firstname: str):
     self._firstname = firstname
