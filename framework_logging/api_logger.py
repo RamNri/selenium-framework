@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from framework_logging.log_utils import LogUtils
+from core.data.fake_data import FakeData
 
 logger = logging.getLogger("api")
 
@@ -34,6 +35,11 @@ class ApiLogger:
 
     logger.info("Method :%s", method)
     logger.info("URL    :%s", url)
+
+    if FakeData.current_seed() is not None:
+      logger.info(
+        "Random seed: %s", FakeData.current_seed()
+      )
 
     if headers:
       logger.info("Headers")
