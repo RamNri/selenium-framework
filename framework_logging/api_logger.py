@@ -4,7 +4,7 @@ import logging
 from typing import Any
 
 from framework_logging.log_utils import LogUtils
-from core.data.fake_data import FakeData
+from core.execution.execution_context import ExecutionContext
 
 logger = logging.getLogger("api")
 
@@ -33,13 +33,19 @@ class ApiLogger:
     logger.info("HTTP REQUEST")
     logger.info("=" * 100)
 
+    logger.info("Execution Id: %s", ExecutionContext.execution_id())
+    logger.info("Thread Id: %s", ExecutionContext.thread_id())
+
     logger.info("Method :%s", method)
     logger.info("URL    :%s", url)
 
-    if FakeData.current_seed() is not None:
+    seed = ExecutionContext.seed()
+    if seed is not None:
       logger.info(
-        "Random seed: %s", FakeData.current_seed()
+        "Random seed: %s", seed,
       )
+
+    logger.info("Test Name: %s", ExecutionContext.test_name())
 
     if headers:
       logger.info("Headers")
