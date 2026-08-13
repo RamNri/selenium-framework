@@ -1,6 +1,6 @@
 import logging
 from selenium.webdriver.common.by import By
-from pages.inventory_page import InventroPage
+from pages.inventory_page import InventoryPage
 from pages.base_page import BasePage
 from config.settings import BASE_URL
 
@@ -12,6 +12,7 @@ class LoginPage(BasePage):
     USERNAME = (By.ID, "user-name")
     PASSWORD = (By.ID, "password")
     LOGIN_BUTTON = (By.ID, "login-button")
+    ERROR_MESSAGE = (By.CSS_SELECTOR, '[data-test="error"]')
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -31,8 +32,11 @@ class LoginPage(BasePage):
         self.find(self.LOGIN_BUTTON).click()
     
     def login(self, username, password):
-        logger.info("Attemtpting login with user '%s'", username)
+        logger.info("Attempting login with user '%s'", username)
         self.enter_username(username)
         self.enter_password(password)
-        self.click(self.LOGIN_BUTTON)
-        return InventroPage(self.driver)
+        self.click_login()
+        return self
+
+    def get_error_message(self):
+        return self.get_text(self.ERROR_MESSAGE)

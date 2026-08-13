@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
 
-class InventroPage(BasePage):
+class InventoryPage(BasePage):
   TITLE = (By.CLASS_NAME, "title")
 
   def __init__(self, driver):

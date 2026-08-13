@@ -17,3 +17,6 @@ RETRY_STATUS_CODES = {
   503,  #Service Unavailable
   504   #Gateway timeout
 }
+
+BROWSER = "chrome"
+HEADLESS = False

@@ -6,6 +6,7 @@ from .configuration_exception import ConfigurationException
 from .mapping_exception import MappingException
 from .json_load_exception import JsonLoadException
 from .api_request_exception import ApiRequestException
+from .element_not_found_exception import ElementNotFoundError
 
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
   "MappingException",
   "JsonLoadException",
   "ApiRequestException",
+  "ElementNotFoundError",
 ]
 
