@@ -5,19 +5,30 @@ from selenium.webdriver import EdgeOptions
 from core.driver.browser import Browser
 
 class DriverOptions:
-
-  @staticmethod
-  def create(browser: Browser, headless: bool):
+  def create(browser:Browser, headless: bool):
     if browser == Browser.CHROME:
       options = ChromeOptions()
+
+      if headless:
+        options.add_argument("--headless=new")
     elif browser == Browser.FIREFOX:
       options = FirefoxOptions()
-    else:
+
+      if headless:
+        options.add_argument("--headless")
+    elif browser == Browser.EDGE:
       options = EdgeOptions()
 
-    if headless:
-      options.add_argument("--headless=new")
+      if headless:
+        options.add_argument("--headless=new")
+    else:
+      raise ValueError(
+        f"unsupported browser: {browser}"
+      )
 
     options.add_argument("--start-maximized")
 
     return options
+        
+
+    

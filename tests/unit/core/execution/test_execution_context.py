@@ -20,3 +20,7 @@ class TestExecutionContext:
   def test_test_name(self):
     ExecutionContext.set_test_name("booking")
     assert(ExecutionContext.test_name() == "booking")
+
+  def test_worker_id(self):
+    ExecutionContext.set_worker_id("gw0")
+    assert ExecutionContext.worker_id() == "gw0"

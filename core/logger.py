@@ -3,6 +3,16 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from datetime import datetime
+from core.execution.execution_context import ExecutionContext
+
+class ExecutionContextFilter(logging.Filter):
+  def filter(self, record: logging.LogRecord) -> bool:
+    record.execution_id = ExecutionContext.execution_id()
+    record.worker_id = ExecutionContext.worker_id()
+    record.thread_id = ExecutionContext.thread_id()
+    record.test_name = ExecutionContext.test_name()
+    record.seed = ExecutionContext.seed()
+    return True
 
 def configure_logging() -> logging.Logger:
   """
@@ -29,9 +39,14 @@ def configure_logging() -> logging.Logger:
 
   formatter = logging.Formatter(
     fmt=(
-      "%(asctime)s |"
-      "%(levelname)-8s |"
-      "%(name)-15s |"
+      "%(asctime)s | "
+      "%(levelname)-8s | "
+      "%(name)-25s | "
+      "[exec=%(execution_id)s | "
+      "worker=%(worker_id)s | "
+      "thread=%(thread_id)s | "
+      "test=%(test_name)s | "
+      "seed=%(seed)s] | "
       "%(message)s"
       ),
       datefmt="%Y-%m-%d %H:%M:%S",
@@ -42,13 +57,18 @@ def configure_logging() -> logging.Logger:
 
   root_logger.setLevel(logging.INFO)
 
+  context_filter = ExecutionContextFilter()
+
   #Console handler
   console_handler = logging.StreamHandler()
   console_handler.setFormatter(formatter)
+  console_handler.addFilter(context_filter)
+
 
   #File handler
   file_handler = logging.FileHandler(log_file, encoding="utf-8")
   file_handler.setFormatter(formatter)
+  file_handler.addFilter(context_filter)
 
   root_logger.addHandler(console_handler)
   root_logger.addHandler(file_handler)

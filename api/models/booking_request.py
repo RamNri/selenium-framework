@@ -1,6 +1,10 @@
+from dataclasses import dataclass
 from api.models.booking import Booking
 
+@dataclass(slots=True, frozen=True)
 class BookingRequest:
   
-  def __init__(self, booking: Booking):
-    self.booking = booking
+  """
+  Request model used to create or update bookings
+  """
+  booking: Booking

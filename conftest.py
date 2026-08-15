@@ -9,6 +9,7 @@ from core.driver.driver_factory import DriverFactory
 from core.logger import configure_logging
 
 from pytest_html import extras
+from core.execution.execution_context import ExecutionContext
 
 
 configure_logging()
@@ -23,21 +24,36 @@ def pytest_addoption(parser):
         help="Browser to run tests on",
     )
 
+    parser.addoption(
+        "--headless",
+        action="store_true",
+        default=False,
+        help="Run browser in headless mode",
+    )
+
 
 @pytest.fixture
 def driver(request):
 
     browser = request.config.getoption("--browser")
+    headless = request.config.getoption("--headless")
 
     # Command-line browser selection overrides
     # the default framework configuration for this run.
     settings.BROWSER = browser
+    settings.HEADLESS = headless
 
     driver = DriverFactory.create()
 
     yield driver
 
     DriverFactory.quit()
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_setup(item):
+    worker_id = getattr(item.config, "workerinput", {},).get("workerid", "master",)
+    ExecutionContext.set_worker_id(worker_id)
+    ExecutionContext.set_test_name(item.nodeid)
 
 
 @pytest.hookimpl(hookwrapper=True)

@@ -2,6 +2,7 @@ from api.auth.authentication_manager import AuthenticationManager
 from api.clients.booking_client import BookingClient
 from api.models.booking_request import BookingRequest
 from api.responses.booking_response import BookingResponse
+from api.responses.base_response import BaseResponse
 
 class BookingService:
   """
@@ -51,7 +52,7 @@ class BookingService:
   
   def delete_booking(
       self, 
-      booking_id: int) -> BookingResponse:
+      booking_id: int) -> BaseResponse:
     """Deletes an existing booking"""
 
     return self._client.delete_booking(

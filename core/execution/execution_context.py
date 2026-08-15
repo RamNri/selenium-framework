@@ -21,8 +21,10 @@ class ExecutionContext:
       return
 
     cls._context.initialized = True
-
+  
     cls._context.execution_id = (uuid.uuid4().hex)
+
+    cls._context.worker_id = None
 
     cls._context.thread_id = (threading.get_ident())
 
@@ -40,6 +42,16 @@ class ExecutionContext:
   def execution_id(cls):
     cls.initialize()
     return cls._context.execution_id
+
+  @classmethod
+  def worker_id(cls):
+    cls.initialize()
+    return cls._context.worker_id
+
+  @classmethod
+  def set_worker_id(cls, value):
+    cls.initialize()
+    cls._context.worker_id = value
 
   @classmethod
   def thread_id(cls):
