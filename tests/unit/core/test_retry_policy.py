@@ -127,3 +127,28 @@ class TestRetryPolicy:
     assert result.status_code == 200
     assert operation.call_count == 2
     self.fake_sleep.assert_called_once_with(1)
+
+  def test_returns_final_response_after_retryable_status_is_exhausted(self):
+    response = Mock()
+    response.status_code = 503
+
+    operation = Mock(
+        side_effect=[
+            response,
+            response,
+            response,
+        ]
+    )
+
+    result = self.policy.execute(operation)
+
+    assert result.status_code == 503
+    assert operation.call_count == 3
+
+    self.fake_sleep.assert_has_calls(
+        [
+            call(1),
+            call(2),
+        ]
+    )
+    
