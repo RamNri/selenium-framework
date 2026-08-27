@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import logging
 from pathlib import Path
 from datetime import datetime
@@ -33,7 +34,7 @@ def configure_logging() -> logging.Logger:
   log_directory.mkdir(parents=True, exist_ok=True)
 
   log_file = log_directory/ "framework.log"
-  
+
 
   #It structures your log text into a clean, predictable, tabular format separated by pipes (|)
 
@@ -72,6 +73,8 @@ def configure_logging() -> logging.Logger:
 
   root_logger.addHandler(console_handler)
   root_logger.addHandler(file_handler)
+
+  logging.getLogger().info("Logging process PID: %s", os.getpid())
 
   root_logger.info("=" * 80)
   root_logger.info("Logging started")

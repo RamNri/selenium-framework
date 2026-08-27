@@ -46,3 +46,6 @@ downloads/
 
 # Misc
 .cache/
+
+# Framework-generated artifacts
+artifacts/

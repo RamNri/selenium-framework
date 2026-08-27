@@ -2,6 +2,17 @@ import json
 
 class LogUtils:
 
+  SENSITIVE_FIELDS = {
+    "password",
+    "token",
+    "access_token",
+    "refresh_token",
+    "authorization",
+    "api_key",
+    "secret",
+    "client_secret",
+  }
+
   SENSITIVE_HEADERS = {
     "authorization",
     "cookie",
@@ -30,3 +41,23 @@ class LogUtils:
       else:
         masked[key] = value
     return masked
+
+  @staticmethod
+  def mask_sensitive_data(data):
+    if isinstance(data, dict):
+      return {
+        key: (
+          "********"
+          if key.lower() in LogUtils.SENSITIVE_FIELDS
+          else LogUtils.mask_sensitive_data(value)
+        )
+        for key, value in data.items()
+      }
+
+    if isinstance(data, list):
+      return[
+        LogUtils.mask_sensitive_data(item)
+        for item in data
+      ]
+
+    return data

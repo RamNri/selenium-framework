@@ -35,44 +35,8 @@ class ApiLogger:
         logger.info("=" * 100)
         logger.info("HTTP REQUEST")
         logger.info("=" * 100)
-
-        logger.info(
-            "Execution Id: %s",
-            ExecutionContext.execution_id(),
-        )
-
-        logger.info(
-            "Worker Id: %s",
-            ExecutionContext.worker_id(),
-        )
-
-        logger.info(
-            "Thread Id: %s",
-            ExecutionContext.thread_id(),
-        )
-
-        logger.info(
-            "Method :%s",
-            method,
-        )
-
-        logger.info(
-            "URL    :%s",
-            url,
-        )
-
-        seed = ExecutionContext.seed()
-
-        if seed is not None:
-            logger.info(
-                "Random seed: %s",
-                seed,
-            )
-
-        logger.info(
-            "Test Name: %s",
-            ExecutionContext.test_name(),
-        )
+        logger.info( "Method :%s", method,)
+        logger.info("URL    :%s", url,)
 
         if headers:
             logger.info("Headers")
@@ -89,7 +53,7 @@ class ApiLogger:
 
             logger.info(
                 "\n%s",
-                LogUtils.pretty_json(body),
+                LogUtils.pretty_json(LogUtils.mask_sensitive_data(body)),
             )
 
     @staticmethod
@@ -99,27 +63,20 @@ class ApiLogger:
         logger.info("HTTP RESPONSE")
         logger.info("-" * 100)
 
-        logger.info(
-            "Status code : %s",
-            response.status_code,
-        )
+        logger.info( "Status code : %s", response.status_code, )
 
-        logger.info(
-            "Reason : %s",
-            response.reason,
-        )
+        logger.info("Reason : %s", response.reason,)
 
-        logger.info(
-            "Elapsed : %.3f sec",
-            response.elapsed.total_seconds(),
-        )
+        logger.info("Elapsed : %.3f sec", response.elapsed.total_seconds(),)
 
         logger.info("Headers")
 
         logger.info(
             "\n%s",
             LogUtils.pretty_json(
-                dict(response.headers)
+                LogUtils.mask_headers(
+                    dict(response.headers)
+                )
             ),
         )
 
@@ -128,10 +85,7 @@ class ApiLogger:
 
             logger.info("Response Body")
 
-            logger.info(
-                "\n%s",
-                LogUtils.pretty_json(body),
-            )
+            logger.info("\n%s",LogUtils.pretty_json(LogUtils.mask_sensitive_data(body)), )
 
         except ValueError:
             logger.info("Response Body")

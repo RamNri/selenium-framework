@@ -83,6 +83,8 @@ class DriverFactory:
         driver = creator(options)
 
         ExecutionContext.set_driver(driver)
+        ExecutionContext.set_browser(browser.value)
+        ExecutionContext.set_session_id(driver.session_id)
 
         logger.info(
             "Browser created : %s",
@@ -117,3 +119,5 @@ class DriverFactory:
         driver.quit()
 
         ExecutionContext.set_driver(None)
+        ExecutionContext.set_browser(None)
+        ExecutionContext.set_session_id(None)

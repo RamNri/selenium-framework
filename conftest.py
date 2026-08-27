@@ -1,16 +1,17 @@
 import pytest
-
-from pathlib import Path
-from datetime import datetime
+import logging
 
 from config import settings
 
 from core.driver.driver_factory import DriverFactory
 from core.logger import configure_logging
 
-from pytest_html import extras
 from core.execution.execution_context import ExecutionContext
+from framework_logging.failure_sanitizer import FailureSanitizer
+from framework_logging.failure_artifact_manager import (FailureArtifactManager,)
+from pytest_html import extras
 
+logger = logging.getLogger("test.lifecycle")
 
 configure_logging()
 
@@ -53,8 +54,8 @@ def driver(request):
 def pytest_runtest_setup(item):
     worker_id = getattr(item.config, "workerinput", {},).get("workerid", "master",)
     ExecutionContext.set_worker_id(worker_id)
-    ExecutionContext.set_test_name(item.nodeid)
-
+    ExecutionContext.start_test(item.nodeid)
+    logger.info("TEST START")
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
@@ -62,53 +63,63 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
 
     report = outcome.get_result()
+    report.execution_id = ExecutionContext.execution_id()
+    report.worker_id = ExecutionContext.worker_id()
+    report.thread_id = ExecutionContext.thread_id()
+    report.test_name = ExecutionContext.test_name()
+    report.seed = ExecutionContext.seed()
+    report.browser = ExecutionContext.browser()
+    report.session_id = ExecutionContext.session_id()
 
     if report.when != "call":
         return
+    status = "PASSED" if report.passed else "FAILED"
+    logger.info(
+        "TEST END | Status = %s | duration=%.3f sec", status, ExecutionContext.duration(),
+    )
 
     if not report.failed:
         return
+
+    failure_text = FailureSanitizer.sanitize(str(report.longrepr))
+    logger.error("TEST FAILED | message=%s", failure_text,)
 
     driver = item.funcargs.get("driver")
 
     if driver is None:
         return
 
-    screenshot_dir = (
-        Path("artifacts")
-        / "screenshots"
-        / item.name
+    filepath = FailureArtifactManager.capture_screenshot(driver, item.name,)
+
+    FailureArtifactManager.attach_screenshot(report, filepath,)
+
+
+def pytest_html_results_table_header(cells):
+    cells.insert(2, "<th>Execution ID</th>")
+    cells.insert(3, "<th>Worker</th>")
+    cells.insert(4, "<th>Thread</th>")
+    cells.insert(5, "<th>Browser</th>")
+    cells.insert(6, "<th>Session ID</th>")
+
+def pytest_html_results_table_row(report, cells):
+    cells.insert(
+        2,
+        f"<td>{getattr(report, 'execution_id', '-')}</td>",
     )
 
-    screenshot_dir.mkdir(
-        parents=True,
-        exist_ok=True,
+    cells.insert(
+        3,
+        f"<td>{getattr(report, 'worker_id', '-')}</td>",
     )
-
-    timestamp = datetime.now().strftime(
-        "%Y%m%d_%H%M%S"
+    cells.insert(
+    4,
+    f"<td>{getattr(report, 'thread_id', '-')}</td>",
     )
-
-    filename = (
-        f"{item.name}_{timestamp}.png"
-    )
-
-    filepath = screenshot_dir / filename
-
-    driver.save_screenshot(
-        str(filepath)
-    )
-
-    extra = getattr(
-        report,
-        "extras",
-        [],
-    )
-
-    extra.append(
-        extras.image(
-            str(filepath)
+    cells.insert(
+        5,
+        f"<td>{getattr(report, 'browser', '-')}</td>",
         )
+    cells.insert(
+        6,
+        f"<td>{getattr(report, 'session_id', '-')}</td>",
     )
-
-    report.extras = extra
