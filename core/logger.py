@@ -13,6 +13,8 @@ class ExecutionContextFilter(logging.Filter):
     record.thread_id = ExecutionContext.thread_id()
     record.test_name = ExecutionContext.test_name()
     record.seed = ExecutionContext.seed()
+    record.browser = ExecutionContext.browser()
+    record.session_id = ExecutionContext.session_id()
     return True
 
 def configure_logging() -> logging.Logger:
@@ -48,6 +50,8 @@ def configure_logging() -> logging.Logger:
       "thread=%(thread_id)s | "
       "test=%(test_name)s | "
       "seed=%(seed)s] | "
+      "browser=%(browser)s |"
+      "session=%(session_id)s] |"
       "%(message)s"
       ),
       datefmt="%Y-%m-%d %H:%M:%S",

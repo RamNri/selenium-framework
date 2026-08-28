@@ -8,6 +8,8 @@ class TestExecutionContextFilter:
 
     ExecutionContext.set_worker_id("gw0")
     ExecutionContext.set_test_name("test_example")
+    ExecutionContext.set_browser("chrome")
+    ExecutionContext.set_session_id("session-123")
 
     record = logging.LogRecord(
       name="test",
@@ -29,3 +31,6 @@ class TestExecutionContextFilter:
     assert record.thread_id == (ExecutionContext.thread_id())
     assert record.test_name == "test_example"
     assert record.seed == (ExecutionContext.seed())
+    assert record.browser == "chrome"
+    assert record.session_id == "session-123"
+    
