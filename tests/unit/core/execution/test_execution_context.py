@@ -1,3 +1,4 @@
+import threading
 from core.execution.execution_context import ExecutionContext
 from datetime import datetime, timedelta
 
@@ -106,3 +107,125 @@ class TestExecutionContext:
     assert ExecutionContext.driver() is None
     assert ExecutionContext.browser() is None
     assert ExecutionContext.session_id() is None
+
+  def test_execution_context_is_isolated_between_threads(self):
+
+    results = {}
+
+    def worker(name, browser, session_id):
+
+        ExecutionContext.start_test(name)
+
+        ExecutionContext.set_browser(browser)
+        ExecutionContext.set_session_id(session_id)
+
+        results[name] = {
+            "test_name": ExecutionContext.test_name(),
+            "browser": ExecutionContext.browser(),
+            "session_id": ExecutionContext.session_id(),
+            "thread_id": ExecutionContext.thread_id(),
+        }
+
+    thread_a = threading.Thread(
+        target=worker,
+        args=("test_a", "chrome", "session-a"),
+    )
+
+    thread_b = threading.Thread(
+        target=worker,
+        args=("test_b", "firefox", "session-b"),
+    )
+
+    thread_a.start()
+    thread_b.start()
+
+    thread_a.join()
+    thread_b.join()
+
+    assert results["test_a"]["test_name"] == "test_a"
+    assert results["test_a"]["browser"] == "chrome"
+    assert results["test_a"]["session_id"] == "session-a"
+
+    assert results["test_b"]["test_name"] == "test_b"
+    assert results["test_b"]["browser"] == "firefox"
+    assert results["test_b"]["session_id"] == "session-b"
+
+    assert (
+        results["test_a"]["thread_id"]
+        != results["test_b"]["thread_id"]
+    )
+
+  def test_reset_faker_recreates_deterministic_faker(self):
+
+    ExecutionContext.set_seed(12345)
+    ExecutionContext.reset_faker()
+
+    first_faker = ExecutionContext.faker()
+    first_value = first_faker.name()
+
+    ExecutionContext.reset_faker()
+
+    second_faker = ExecutionContext.faker()
+    second_value = second_faker.name()
+
+    assert first_faker is not second_faker
+
+    assert first_value == second_value
+
+  def test_start_test_creates_new_faker_instance(self):
+
+    ExecutionContext.start_test("test_a")
+
+    faker_a = ExecutionContext.faker()
+
+    ExecutionContext.start_test("test_b")
+
+    faker_b = ExecutionContext.faker()
+
+    assert faker_a is not faker_b
+
+  def test_start_test_resets_test_state_and_preserves_worker_state(self):
+
+    ExecutionContext.set_worker_id("gw0")
+    original_thread_id = ExecutionContext.thread_id()
+
+    ExecutionContext.set_driver(object())
+    ExecutionContext.set_browser("chrome")
+    ExecutionContext.set_session_id("session-123")
+    ExecutionContext.set_test_name("old_test")
+
+    old_execution_id = ExecutionContext.execution_id()
+
+    ExecutionContext.start_test("new_test")
+
+    assert ExecutionContext.worker_id() == "gw0"
+    assert ExecutionContext.thread_id() == original_thread_id
+
+    assert ExecutionContext.test_name() == "new_test"
+    assert ExecutionContext.execution_id() != old_execution_id
+
+    assert ExecutionContext.driver() is None
+    assert ExecutionContext.browser() is None
+    assert ExecutionContext.session_id() is None
+
+  def test_initialize_does_not_reset_existing_context_state(self):
+
+    ExecutionContext.set_worker_id("gw0")
+    ExecutionContext.set_test_name("booking_test")
+    ExecutionContext.set_browser("chrome")
+    ExecutionContext.set_session_id("session-123")
+
+    original_execution_id = ExecutionContext.execution_id()
+    original_started_at = ExecutionContext.started_at()
+    original_seed = ExecutionContext.seed()
+
+    ExecutionContext.initialize()
+
+    assert ExecutionContext.worker_id() == "gw0"
+    assert ExecutionContext.test_name() == "booking_test"
+    assert ExecutionContext.browser() == "chrome"
+    assert ExecutionContext.session_id() == "session-123"
+
+    assert ExecutionContext.execution_id() == original_execution_id
+    assert ExecutionContext.started_at() == original_started_at
+    assert ExecutionContext.seed() == original_seed

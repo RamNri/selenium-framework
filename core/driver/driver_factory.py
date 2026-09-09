@@ -60,6 +60,7 @@ def _create_edge(options):
 
 class DriverFactory:
 
+
     _CREATORS = {
         Browser.CHROME: _create_chrome,
         Browser.FIREFOX: _create_firefox,
@@ -69,22 +70,39 @@ class DriverFactory:
     @staticmethod
     def create():
 
-        browser = Browser(
-            settings.BROWSER.lower()
-        )
+        # Read browser configuration
+        browser = Browser(settings.BROWSER)
 
+        # Create browser options
         options = DriverOptions.create(
             browser,
             settings.HEADLESS,
         )
 
+        # Find correct browser creator
         creator = DriverFactory._CREATORS[browser]
 
+        # Create the browser driver
         driver = creator(options)
 
-        ExecutionContext.set_driver(driver)
-        ExecutionContext.set_browser(browser.value)
-        ExecutionContext.set_session_id(driver.session_id)
+        try:
+            # Publish execution context
+            ExecutionContext.set_driver(driver)
+            ExecutionContext.set_browser(browser.value)
+            ExecutionContext.set_session_id(driver.session_id)
+
+        except Exception:
+            try:
+                driver.quit()
+            except Exception:
+                logger.exception(
+                    "Failed to clean up browser after driver creation"
+                )
+
+            finally:
+                DriverFactory._clear_execution_context()
+
+            raise
 
         logger.info(
             "Browser created : %s",
@@ -115,9 +133,26 @@ class DriverFactory:
             "Closing browser session %s",
             driver.session_id,
         )
+        try:
+            driver.quit()
 
-        driver.quit()
+        finally:
+            DriverFactory._clear_execution_context()
 
-        ExecutionContext.set_driver(None)
-        ExecutionContext.set_browser(None)
-        ExecutionContext.set_session_id(None)
+    @staticmethod
+    def _clear_execution_context():
+
+        try:
+            ExecutionContext.set_driver(None)
+        except Exception:
+            pass
+
+        try:
+            ExecutionContext.set_browser(None)
+        except Exception:
+            pass
+
+        try:
+            ExecutionContext.set_session_id(None)
+        except Exception:
+            pass

@@ -1,12 +1,28 @@
-BASE_URL = "https://www.saucedemo.com"
+ENVIRONMENT = "local"
+BASE_URL = None
+API_BASE_URL=None
+
+#=========================================
+#UI Settings
+#=========================================
 USERNAME = "standard_user"
 PASSWORD = "secret_sauce"
 TIMEOUT = 10
-API_BASE_URL='https://restful-booker.herokuapp.com'
+BROWSER = "chrome"
+HEADLESS = False
+
+#==========================================
+#API Settings
+#==========================================
+
 REQUEST_TIMEOUT = 30
 API_USERNAME = "admin"
 API_PASSWORD = "password123"
 MAX_API_RESPONSE_TIME = 5
+
+#===========================================
+#Retry settings
+#===========================================
 MAX_RETRIES = 3
 RETRY_DELAY = 1  #SECONDS
 RETRY_BACKOFF = 2  #EXPONENTIAL MULTIPLIER
@@ -17,6 +33,3 @@ RETRY_STATUS_CODES = {
   503,  #Service Unavailable
   504   #Gateway timeout
 }
-
-BROWSER = "chrome"
-HEADLESS = False

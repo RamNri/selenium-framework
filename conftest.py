@@ -1,15 +1,13 @@
 import pytest
 import logging
 
-from config import settings
-
 from core.driver.driver_factory import DriverFactory
 from core.logger import configure_logging
 
 from core.execution.execution_context import ExecutionContext
 from framework_logging.failure_sanitizer import FailureSanitizer
 from framework_logging.failure_artifact_manager import (FailureArtifactManager,)
-from pytest_html import extras
+from config.framework_configurator import FrameworkConfigurator
 
 logger = logging.getLogger("test.lifecycle")
 
@@ -32,17 +30,24 @@ def pytest_addoption(parser):
         help="Run browser in headless mode",
     )
 
+    parser.addoption(
+        "--env",
+        action="store",
+        default="local",
+        help="Environmnet to run the tests against"
+
+    )
+
+def pytest_configure(config):
+    environment = config.getoption("--env")
+    browser = config.getoption("--browser")
+    headless = config.getoption("--headless")
+
+    FrameworkConfigurator.configure(environment=environment, browser=browser, headless=headless)
+
 
 @pytest.fixture
-def driver(request):
-
-    browser = request.config.getoption("--browser")
-    headless = request.config.getoption("--headless")
-
-    # Command-line browser selection overrides
-    # the default framework configuration for this run.
-    settings.BROWSER = browser
-    settings.HEADLESS = headless
+def driver():
 
     driver = DriverFactory.create()
 

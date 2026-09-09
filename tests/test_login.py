@@ -22,7 +22,7 @@ def test_successful_login(driver, username, password):
   inventory = ( 
     LoginService(driver).login(username, password)
   )
-  assert inventory.is_loaded()
+  assert inventory.is_loaded()  
 
 @pytest.mark.parametrize( "username,password", INVALID_LOGIN_USERS,
   ids=[

@@ -5,6 +5,8 @@ from selenium.webdriver import EdgeOptions
 from core.driver.browser import Browser
 
 class DriverOptions:
+  
+  @staticmethod
   def create(browser:Browser, headless: bool):
     if browser == Browser.CHROME:
       options = ChromeOptions()
