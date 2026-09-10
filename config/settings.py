@@ -11,6 +11,9 @@ TIMEOUT = 10
 BROWSER = "chrome"
 HEADLESS = False
 
+EXECUTION_MODE = "local"
+GRID_URL = "http://selenium-hub:4444"
+
 #==========================================
 #API Settings
 #==========================================

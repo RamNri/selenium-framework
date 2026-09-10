@@ -12,6 +12,7 @@ class TestFrameworkConfigurator:
       environment="qa",
       browser="chrome",
       headless=False,
+      execution_mode="local",
     )
 
     assert settings.ENVIRONMENT == "qa"
@@ -24,7 +25,8 @@ class TestFrameworkConfigurator:
     FrameworkConfigurator.configure(
       environment = "local",
       browser="firefox",
-      headless=True
+      headless=True,
+      execution_mode="local",
     )
     assert settings.BROWSER == "firefox"
     assert settings.HEADLESS is True
@@ -38,6 +40,7 @@ class TestFrameworkConfigurator:
       environment="qa",
       browser="edge",
       headless=True,
+      execution_mode="local",
     )
 
     assert settings.ENVIRONMENT == "qa"
@@ -54,6 +57,7 @@ class TestFrameworkConfigurator:
         environment="invalid",
         browser="chrome",
         headless=False,
+        execution_mode="local",
       )
 
   def test_configure_rejects_invalid_browser(
@@ -65,7 +69,8 @@ class TestFrameworkConfigurator:
       FrameworkConfigurator.configure(
         environment="local",
         browser="invalid",
-        headless=False
+        headless=False,
+        execution_mode="local",
       )
 
   def test_configuration_failure_does_not_leave_partial_state(
@@ -84,6 +89,7 @@ class TestFrameworkConfigurator:
         environment="qa",
         browser="invalid",
         headless=True,
+        execution_mode="local",
       )
 
     assert settings.ENVIRONMENT == original_environment
@@ -92,3 +98,34 @@ class TestFrameworkConfigurator:
 
     assert settings.BROWSER == original_browser
     assert settings.HEADLESS == original_headless
+
+  def test_configure_updates_remote_execution_settings(
+    self,
+    preserve_environment_settings,
+    preserve_runtime_settings
+    ):
+    FrameworkConfigurator.configure(
+        environment="qa",
+        browser="chrome",
+        headless=True,
+        execution_mode="remote",
+    )
+
+    assert settings.ENVIRONMENT == "qa"
+    assert settings.BROWSER == "chrome"
+    assert settings.HEADLESS is True
+    assert settings.EXECUTION_MODE == "remote"
+    assert settings.GRID_URL == "http://selenium-hub:4444"
+
+  def test_configure_rejects_invalid_execution_mode(
+    self,
+    preserve_environment_settings,
+    preserve_runtime_settings
+  ):
+    with pytest.raises(ConfigurationException):
+        FrameworkConfigurator.configure(
+            environment="local",
+            browser="chrome",
+            headless=False,
+            execution_mode="invalid",
+        )

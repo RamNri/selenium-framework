@@ -48,3 +48,23 @@ class TestRuntimeManager:
       headless = False,
     )
     assert settings.BROWSER == 'chrome'
+
+  def test_configure_execution_mode_updates_settings(self):
+    RuntimeManager.configure(
+        browser="chrome",
+        headless=False,
+        execution_mode="remote",
+        grid_url="http://selenium-hub:4444",
+    )
+
+    assert settings.EXECUTION_MODE == "remote"
+    assert settings.GRID_URL == "http://selenium-hub:4444"
+
+  def test_configure_rejects_invalid_execution_mode(self):
+    with pytest.raises(ConfigurationException):
+        RuntimeManager.configure(
+            browser="chrome",
+            headless=False,
+            execution_mode="invalid",
+            grid_url="http://selenium-hub:4444",
+        )

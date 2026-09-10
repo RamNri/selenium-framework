@@ -1,0 +1,39 @@
+services:
+
+  selenium-hub:
+    image: selenium/hub:4.41.0-20260222
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  chrome:
+    image: selenium/node-chrome:4.41.0-20260222
+    shm_size: 2gb
+
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+
+  
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: selenium-framework-runner
+
+    depends_on:
+      chrome:
+        condition: service_started
+
+    command: pytest --execution-mode remote

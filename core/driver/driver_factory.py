@@ -74,16 +74,18 @@ class DriverFactory:
         browser = Browser(settings.BROWSER)
 
         # Create browser options
-        options = DriverOptions.create(
-            browser,
-            settings.HEADLESS,
-        )
+        options = DriverOptions.create(browser, settings.HEADLESS)
 
-        # Find correct browser creator
-        creator = DriverFactory._CREATORS[browser]
+        if settings.EXECUTION_MODE == "remote":
+            driver = webdriver.Remote(command_executor=settings.GRID_URL, options=options)
 
-        # Create the browser driver
-        driver = creator(options)
+        else:
+
+            # Find correct browser creator
+            creator = DriverFactory._CREATORS[browser]
+
+            # Create the browser driver
+            driver = creator(options)
 
         try:
             # Publish execution context
@@ -104,15 +106,9 @@ class DriverFactory:
 
             raise
 
-        logger.info(
-            "Browser created : %s",
-            browser.value,
-        )
+        logger.info("Browser created : %s", browser.value,)
 
-        logger.info(
-            "Session Id : %s",
-            driver.session_id,
-        )
+        logger.info("Session Id : %s", driver.session_id,)
 
         return driver
 

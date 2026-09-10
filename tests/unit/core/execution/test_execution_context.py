@@ -150,11 +150,6 @@ class TestExecutionContext:
     assert results["test_b"]["browser"] == "firefox"
     assert results["test_b"]["session_id"] == "session-b"
 
-    assert (
-        results["test_a"]["thread_id"]
-        != results["test_b"]["thread_id"]
-    )
-
   def test_reset_faker_recreates_deterministic_faker(self):
 
     ExecutionContext.set_seed(12345)

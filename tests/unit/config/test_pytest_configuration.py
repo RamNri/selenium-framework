@@ -31,14 +31,16 @@ class TestPytestConfiguration:
             "--env": "qa",
             "--browser": "firefox",
             "--headless": True,
+            "--execution-mode": "local",
         }.get
 
         conftest.pytest_configure(config)
 
         configure.assert_called_once_with(
-            environment="qa",
-            browser="firefox",
-            headless=True,
+          environment="qa",
+          browser="firefox",
+          headless=True,
+          execution_mode="local",
         )
     
     def test_pytest_addoption_registers_framework_cli_options(self):
@@ -47,7 +49,7 @@ class TestPytestConfiguration:
 
         conftest.pytest_addoption(parser)
 
-        assert parser.addoption.call_count == 3
+        assert parser.addoption.call_count == 4
 
         parser.addoption.assert_any_call(
             "--browser",
@@ -69,6 +71,14 @@ class TestPytestConfiguration:
             default="local",
             help="Environmnet to run the tests against",
         ) 
+
+        parser.addoption.assert_any_call(
+          "--execution-mode",
+            action="store",
+            default="local",
+            choices=["local", "remote"],
+            help="Execution mode: local or remote",
+        )
 
     @patch("framework_conftest.ExecutionContext.start_test")
     @patch("framework_conftest.ExecutionContext.set_worker_id")

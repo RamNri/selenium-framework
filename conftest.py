@@ -31,6 +31,14 @@ def pytest_addoption(parser):
     )
 
     parser.addoption(
+        "--execution-mode",
+        action="store",
+        default="local",
+        choices=["local", "remote"],
+        help="Execution mode: local or remote",
+    )
+
+    parser.addoption(
         "--env",
         action="store",
         default="local",
@@ -42,8 +50,9 @@ def pytest_configure(config):
     environment = config.getoption("--env")
     browser = config.getoption("--browser")
     headless = config.getoption("--headless")
+    execution_mode = config.getoption("--execution-mode")
 
-    FrameworkConfigurator.configure(environment=environment, browser=browser, headless=headless)
+    FrameworkConfigurator.configure(environment=environment, browser=browser, headless=headless, execution_mode=execution_mode)
 
 
 @pytest.fixture
